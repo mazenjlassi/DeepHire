@@ -2,6 +2,8 @@ package org.example.deephire.Repositories;
 
 import org.example.deephire.models.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface messageRepository extends JpaRepository<Long, Message> {
+@Repository
+public interface messageRepository extends JpaRepository<Message,Long> {
 }
