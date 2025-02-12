@@ -2,16 +2,30 @@ package org.example.deephire.Service;
 
 import org.example.deephire.Repositories.AdminCompanyRepository;
 import org.example.deephire.models.AdminCompany;
-import org.example.deephire.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AdminCompanyService {
 
-     @Autowired
-     private AdminCompanyRepository adminCompanyRepository;
+    @Autowired
+    private AdminCompanyRepository adminCompanyRepository;
 
-     public AdminCompany addAdmin (AdminCompany adminCompany){return adminCompanyRepository.save(adminCompany);}
+    public AdminCompany add(AdminCompany adminCompany){
+        return adminCompanyRepository.save(adminCompany);
+    }
+
+    public AdminCompany findById (Long id){
+         return adminCompanyRepository.findById(id).get();
+    }
+
+    public void delete (Long id){
+         adminCompanyRepository.deleteById(id);
+    }
+
+    public AdminCompany update (AdminCompany adminCompany){
+      return adminCompanyRepository.saveAndFlush(adminCompany);
+    }
+
 
 }
