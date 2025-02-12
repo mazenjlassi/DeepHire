@@ -3,7 +3,8 @@ package org.example.deephire.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -16,4 +17,8 @@ public class AdminCompany extends User {
     public void manageRHUser(RHCompany rhUser) {
         // Business logic
     }
+
+
+
+
 }

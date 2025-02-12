@@ -5,6 +5,8 @@ import org.example.deephire.models.AdminCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AdminCompanyService {
 
@@ -27,5 +29,8 @@ public class AdminCompanyService {
       return adminCompanyRepository.saveAndFlush(adminCompany);
     }
 
+    public List<AdminCompany> all(){
+        return adminCompanyRepository.findAll();
+    }
 
 }

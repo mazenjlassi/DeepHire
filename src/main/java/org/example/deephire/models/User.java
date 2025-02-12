@@ -14,12 +14,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-<<<<<<< HEAD
 
-public abstract class   User {
-=======
-public abstract class User {
->>>>>>> refs/remotes/origin/main
+
+public  class   User {
+
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
