@@ -5,6 +5,8 @@ import org.example.deephire.models.Certification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CertificationService {
     @Autowired
@@ -18,4 +20,6 @@ public class CertificationService {
 
     public Certification update (Certification certification){
         return certificationRepository.saveAndFlush(certification);}
+
+    public List<Certification> findAll(){ return certificationRepository.findAll();}
 }
