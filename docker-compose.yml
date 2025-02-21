@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8
+    container_name: deephire-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: DeepHire
+      MYSQL_USER: user
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - deephire-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: deephire-phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8081:80"
+    networks:
+      - deephire-network
+
+  webserver:
+    image: httpd:latest
+    container_name: deephire-apache
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public_html:/usr/local/apache2/htdocs
+    networks:
+      - deephire-network
+
+  app:
+    build: .
+    container_name: deephire-app
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/DeepHire?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SERVER_PORT: 8095
+    ports:
+      - "8095:8095"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - deephire-network
+
+volumes:
+  mysql_data:
+
+networks:
+  deephire-network:
+    driver: bridge
