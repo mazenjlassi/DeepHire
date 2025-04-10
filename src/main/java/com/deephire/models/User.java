@@ -22,7 +22,10 @@ public  class   User {
     private String lastName;
     private String email;
     private String password;
+    @Column(columnDefinition = "LONGBLOB")
     private String profilePicture;
+    @Column(columnDefinition = "LONGBLOB")
+    private String backGroundImage;
     private String bio;
     private String location;
 
