@@ -1,4 +1,4 @@
-package com.deephire.RestController;
+package com.deephire.Controller;
 
 import com.deephire.Service.CommentService;
 import com.deephire.models.Comment;

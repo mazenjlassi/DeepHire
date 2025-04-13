@@ -1,8 +1,8 @@
-package com.deephire.RestController;
+package com.deephire.Controller;
 
 
-import com.deephire.Service.CompanyService;
-import com.deephire.models.Company;
+import com.deephire.Service.EducationService;
+import com.deephire.models.Education;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,41 +11,41 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/company")
-public class CompanyRestController {
+@RequestMapping("/education")
+public class EducationRestController {
 
     @Autowired
-    private CompanyService companyService;
+    private EducationService educationService;
 
     @PostMapping("/add")
-    public ResponseEntity<Company> add(@RequestBody Company company) {
+    public ResponseEntity<Education> add(@RequestBody Education education) {
         try {
-            Company savedCompany = companyService.add(company);
-            return new ResponseEntity<>(savedCompany, HttpStatus.CREATED);
+            Education savedEducation = educationService.add(education);
+            return new ResponseEntity<>(savedEducation, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Company>> all() {
+    public ResponseEntity<List<Education>> all() {
         try {
-            List<Company> companies = companyService.findAll();
-            if (companies.isEmpty()) {
-                return new ResponseEntity<>(companies, HttpStatus.NO_CONTENT);
+            List<Education> educations = educationService.findAll();
+            if (educations.isEmpty()) {
+                return new ResponseEntity<>(educations, HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(companies, HttpStatus.OK);
+            return new ResponseEntity<>(educations, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/findById/{id}")
-    public ResponseEntity<Company> findById(@PathVariable Long id) {
+    public ResponseEntity<Education> findById(@PathVariable Long id) {
         try {
-            Company company = companyService.find(id);
-            if (company != null) {
-                return new ResponseEntity<>(company, HttpStatus.OK);
+            Education education = educationService.find(id);
+            if (education != null) {
+                return new ResponseEntity<>(education, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -55,12 +55,12 @@ public class CompanyRestController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Company> update(@PathVariable Long id, @RequestBody Company company) {
+    public ResponseEntity<Education> update(@PathVariable Long id, @RequestBody Education education) {
         try {
-            Company existingCompany = companyService.find(id);
-            if (existingCompany != null) {
-                Company updatedCompany = companyService.update(company);
-                return new ResponseEntity<>(updatedCompany, HttpStatus.OK);
+            Education existingEducation = educationService.find(id);
+            if (existingEducation != null) {
+                Education updatedEducation = educationService.update(education);
+                return new ResponseEntity<>(updatedEducation, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -72,7 +72,7 @@ public class CompanyRestController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable Long id) {
         try {
-            companyService.delete(id);
+            educationService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

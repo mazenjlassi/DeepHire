@@ -1,4 +1,4 @@
-package com.deephire.RestController;
+package com.deephire.Controller;
 
 import com.deephire.Service.AdminCompanyService;
 import com.deephire.models.AdminCompany;
