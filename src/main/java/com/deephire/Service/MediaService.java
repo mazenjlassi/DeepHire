@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.MediaRepository;
-import com.deephire.models.Media;
+import com.deephire.Models.Media;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

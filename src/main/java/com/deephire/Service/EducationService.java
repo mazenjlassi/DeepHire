@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.EducationRepository;
-import com.deephire.models.Education;
+import com.deephire.Models.Education;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

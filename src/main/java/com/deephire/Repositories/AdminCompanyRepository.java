@@ -1,6 +1,6 @@
 package com.deephire.Repositories;
 
-import com.deephire.models.AdminCompany;
+import com.deephire.Models.AdminCompany;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

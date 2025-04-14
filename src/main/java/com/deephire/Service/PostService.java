@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.PostRepository;
-import com.deephire.models.Post;
+import com.deephire.Models.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

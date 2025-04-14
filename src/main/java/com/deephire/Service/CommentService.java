@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.CommentRepository;
-import com.deephire.models.Comment;
+import com.deephire.Models.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

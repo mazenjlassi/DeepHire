@@ -1,6 +1,6 @@
 package com.deephire.Repositories;
 
-import com.deephire.models.Skill;
+import com.deephire.Models.Skill;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

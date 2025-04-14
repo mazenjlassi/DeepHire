@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.ExperienceRepository;
-import com.deephire.models.Experience;
+import com.deephire.Models.Experience;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

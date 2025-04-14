@@ -1,6 +1,6 @@
 package com.deephire.Repositories;
 
-import com.deephire.models.Experience;
+import com.deephire.Models.Experience;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

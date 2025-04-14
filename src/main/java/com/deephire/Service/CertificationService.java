@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.CertificationRepository;
-import com.deephire.models.Certification;
+import com.deephire.Models.Certification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

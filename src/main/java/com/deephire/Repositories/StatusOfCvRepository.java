@@ -1,6 +1,6 @@
 package com.deephire.Repositories;
 
-import com.deephire.models.StatusOfCv;
+import com.deephire.Models.StatusOfCv;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

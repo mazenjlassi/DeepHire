@@ -1,6 +1,6 @@
 package com.deephire.Repositories;
 
-import com.deephire.models.Comment;
+import com.deephire.Models.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

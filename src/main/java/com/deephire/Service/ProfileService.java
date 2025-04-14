@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.ProfileRepository;
-import com.deephire.models.Profile;
+import com.deephire.Models.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

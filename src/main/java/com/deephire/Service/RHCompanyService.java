@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.RHCompanyRepository;
-import com.deephire.models.RHCompany;
+import com.deephire.Models.RHCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

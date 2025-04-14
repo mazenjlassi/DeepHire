@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.StatusOfCvRepository;
-import com.deephire.models.StatusOfCv;
+import com.deephire.Models.StatusOfCv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

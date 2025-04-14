@@ -1,7 +1,7 @@
 package com.deephire.Service;
 
 import com.deephire.Repositories.MessageRepository;
-import com.deephire.models.Message;
+import com.deephire.Models.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
