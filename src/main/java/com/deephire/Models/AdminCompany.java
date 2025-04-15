@@ -12,6 +12,10 @@ import lombok.*;
 @Entity
 public class AdminCompany extends User {
 
+    private Boolean isValid;
+
+   private  String  file;
+
     @OneToOne(mappedBy = "admin", cascade = CascadeType.ALL)
     private Company company;
 

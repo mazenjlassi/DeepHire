@@ -1,5 +1,6 @@
 package com.deephire.Controllers;
 
+
 import com.deephire.Service.AdminCompanyService;
 import com.deephire.Models.AdminCompany;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,11 @@ public class AdminCompanyRestController {
 
     @Autowired
     private AdminCompanyService adminCompanyService;
+
+
+
+
+
 
     @PostMapping("/add")
     public ResponseEntity<AdminCompany> add(@RequestBody AdminCompany adminCompany) {

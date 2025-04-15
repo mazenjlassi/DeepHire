@@ -1,27 +1,50 @@
 package com.deephire.Models;
 
-import com.deephire.Enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
+@Data
 @Setter
+@Table(name="users",uniqueConstraints = {
+        @UniqueConstraint(columnNames = "username"),
+        @UniqueConstraint(columnNames = "email")
+})
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String username;
+
+    private String email;
+
+    private String password;
+
+
     private String firstName;
     private String lastName;
-    private String login;
-    private String password;
+
+
+
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name="user_roles",
+            joinColumns = @JoinColumn(name="user_id"),inverseJoinColumns = @JoinColumn(name="role_id"))
+    private Set<Role> roles= new HashSet<>();
+
+
 
     @Column(columnDefinition = "LONGBLOB")
     private String profilePicture;
@@ -33,8 +56,7 @@ public class User {
     private String location;
 
 
-    @Enumerated(EnumType.STRING)
-    Role role= Role.USER;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Profile profile;
 
