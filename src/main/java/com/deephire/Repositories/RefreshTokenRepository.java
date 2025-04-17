@@ -1,6 +1,7 @@
 package com.deephire.Repositories;
 
 import com.deephire.Models.RefreshToken;
+import com.deephire.Models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +14,5 @@ public interface RefreshTokenRepository extends
 
     Optional<RefreshToken> findByToken(String token);
 
+    void deleteByUser(User user);
 }
