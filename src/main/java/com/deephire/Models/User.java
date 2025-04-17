@@ -46,11 +46,13 @@ public class User {
 
 
 
+    @Lob
     @Column(columnDefinition = "LONGBLOB")
-    private String profilePicture;
+    private byte[] profilePicture;
 
+    @Lob
     @Column(columnDefinition = "LONGBLOB")
-    private String backGroundImage;
+    private byte[] backGroundImage;
 
     private String bio;
     private String location;
