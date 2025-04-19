@@ -10,9 +10,10 @@ import com.deephire.Models.Role;
 import com.deephire.Models.User;
 import com.deephire.Repositories.RoleRepository;
 import com.deephire.Repositories.UserRepository;
+import com.deephire.Request.LogOutRequest;
 import com.deephire.Request.LoginRequest;
 import com.deephire.Request.SignupRequest;
-import com.deephire.Service.JwtResponse;
+import com.deephire.Response.JwtResponse;
 import com.deephire.Service.MessageResponse;
 import com.deephire.Service.RefreshTokenService;
 import com.deephire.Service.UserDetailsImpl;
@@ -180,9 +181,8 @@ public class AuthController {
                     .collect(Collectors.toList());
 
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-
+            System.out.println("it is working until this point");
             return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
                     .body(new JwtResponse(
                             jwt,
                             refreshToken.getToken(),
@@ -196,5 +196,13 @@ public class AuthController {
                     .body(new MessageResponse("Error: Authentication failed"));
         }
     }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(@RequestBody LogOutRequest logOutRequest) {
+        refreshTokenService.deleteByUserId(logOutRequest.getUserId());
+        return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+    }
+
 
 }
