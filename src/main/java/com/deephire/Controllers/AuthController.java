@@ -5,6 +5,7 @@ import com.deephire.Enums.ERole;
 
 
 import com.deephire.JWT.JwtUtils;
+import com.deephire.Models.AdminCompany;
 import com.deephire.Models.RefreshToken;
 import com.deephire.Models.Role;
 import com.deephire.Models.User;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,100 +67,78 @@ public class AuthController {
     // Define endpoints for authentication and token management here
 
 
-    @PostMapping(value = "/signup",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
         if (userRepository.existsByUsername(signupRequest.getUsername())) {
             return ResponseEntity.badRequest()
-                    .body(new MessageResponse("Message user already exists "));
+                    .body(new MessageResponse("Message: user already exists"));
         }
-        if (userRepository.existsByEmail(signupRequest.getEmail()))  {
+        if (userRepository.existsByEmail(signupRequest.getEmail())) {
             return ResponseEntity.badRequest()
-                    .body(new MessageResponse("Error :Email is already in use"));
+                    .body(new MessageResponse("Error: Email is already in use"));
         }
 
-
-        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(),
-                encoder.encode(signupRequest.getPassword()));
         Set<String> strRoles = signupRequest.getRole();
+        User user;
+
+        // Decode base64 file if available
+        byte[] decodedFile = null;
+        if (signupRequest.getFile() != null && !signupRequest.getFile().isEmpty()) {
+            decodedFile = Base64.getDecoder().decode(signupRequest.getFile());
+        }
+
+        // Check if ADMIN_COMPANY is among the roles
+        if (strRoles.contains("ADMIN_COMPANY")) {
+            user = new AdminCompany(
+                    signupRequest.getUsername(),
+                    signupRequest.getEmail(),
+                    encoder.encode(signupRequest.getPassword()),
+                    signupRequest.getFirstname(),
+                    signupRequest.getLastname(),
+                    false,  // isValid set to false by default
+                    decodedFile
+            );
+        } else {
+            user = new User(
+                    signupRequest.getUsername(),
+                    signupRequest.getEmail(),
+                    encoder.encode(signupRequest.getPassword()),
+                    signupRequest.getFirstname(),
+                    signupRequest.getLastname()
+            );
+        }
+
         Set<Role> roles = new HashSet<>();
 
-
-
         if (strRoles == null || strRoles.isEmpty()) {
-            // Si aucun rôle n'est spécifié, on met le rôle USER par défaut
             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                     .orElseThrow(() -> new RuntimeException("Role not found"));
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Role not found"));
-                        roles.add(adminRole);
+                    case "ROLE_ADMIN":
+                        roles.add(roleRepository.findByName(ERole.ROLE_ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Role not found")));
                         break;
-                    case "ADMINCOMPANY":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_ADMINCOMPANY)
-                                .orElseThrow(() -> new RuntimeException("Role not found"));
-                        roles.add(modRole);
+                    case "ADMIN_COMPANY":
+                        roles.add(roleRepository.findByName(ERole.ROLE_ADMINCOMPANY)
+                                .orElseThrow(() -> new RuntimeException("Role not found")));
                         break;
                     default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Role not found"));
-                        roles.add(userRole);
+                        roles.add(roleRepository.findByName(ERole.ROLE_USER)
+                                .orElseThrow(() -> new RuntimeException("Role not found")));
                 }
             });
         }
 
         user.setRoles(roles);
         userRepository.save(user);
+
         return ResponseEntity.ok(new MessageResponse("User registered successfully"));
     }
-//    @PostMapping(value="/signin",produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
-//        System.out.println(loginRequest.getPassword()+"000000000000000000000");
-//        try {
-//            Authentication authentication = authenticationManager
-//                    .authenticate(new UsernamePasswordAuthenticationToken(
-//                            loginRequest.getUsername(),
-//                            loginRequest.getPassword()));
-//
-//
-//            System.out.println("//////////////////////////");
-//
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-//
-//            System.out.println(userDetails+"+++++++++++++++++++++++++++++++++");
-//
-//
-//            String jwt = jwtUtils.generateJwtToken(userDetails);
-//
-//            System.out.println(jwt+"/////////////////////////////////////////////");
-//
-//            List<String> roles = userDetails.getAuthorities()
-//                    .stream()
-//                    .map(item -> item.getAuthority())
-//                    .collect(Collectors.toList());
-//
-//            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-//
-//            return ResponseEntity.ok(new JwtResponse(
-//                    jwt,
-//                    refreshToken.getToken(),
-//                    userDetails.getId(),
-//                    userDetails.getUsername(),
-//                    userDetails.getEmail(),
-//                    roles));
-//        } catch (BadCredentialsException e) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body(new MessageResponse("Invalid username or password"));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new MessageResponse("Authentication failed: " + e.getMessage()));
-//        }
-//    }
+
+
 
 
 
