@@ -1,6 +1,7 @@
 package com.deephire.Models;
 
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,8 +26,10 @@ public class JobPosting {
     private String datePosted;
 
     @ManyToOne
+    @JsonBackReference("company-jobposting")
     private Company company;
 
     @OneToMany(mappedBy = "jobPosting", cascade = CascadeType.ALL)
+    @JsonManagedReference("jobposting-status")
     private List<StatusOfCv> statusOfCvs;
 }

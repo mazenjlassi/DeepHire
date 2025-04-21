@@ -30,6 +30,7 @@ public class UserService {
     public User update(User user) { return userRepository.saveAndFlush(user); }
 
     public List<User> findAll() { return userRepository.findAll(); }
+    public  User findByUsername(String username) {return  userRepository.findByUsername(username).get();}
 
 
 }

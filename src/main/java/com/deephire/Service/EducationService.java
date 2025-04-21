@@ -1,5 +1,6 @@
 package com.deephire.Service;
 
+import com.deephire.Models.Profile;
 import com.deephire.Repositories.EducationRepository;
 import com.deephire.Models.Education;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,4 +22,10 @@ public class EducationService {
     public Education update(Education education) { return educationRepository.saveAndFlush(education); }
 
     public List<Education> findAll() { return educationRepository.findAll(); }
+
+    public List<Education> saveAllEducationWithProfile(List<Education> educationList, Profile profile) {
+        educationList.forEach(education -> education.setProfile(profile));
+        return educationRepository.saveAll(educationList);
+    }
+
 }

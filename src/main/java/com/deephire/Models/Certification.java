@@ -1,5 +1,6 @@
 package com.deephire.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +25,8 @@ public class Certification {
     private Date issueDate;
     private Date expirationDate;
 
-
     @ManyToOne
+    @JsonBackReference("profile-certification")
     @JoinColumn(name = "profile_id")
     private Profile profile;
 }

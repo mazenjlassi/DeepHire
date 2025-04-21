@@ -31,10 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
 import java.util.HashSet;
@@ -78,6 +75,7 @@ public class AuthController {
                     .body(new MessageResponse("Error: Email is already in use"));
         }
 
+        System.out.println(signupRequest);
         Set<String> strRoles = signupRequest.getRole();
         User user;
 
@@ -107,6 +105,9 @@ public class AuthController {
                     signupRequest.getLastname()
             );
         }
+        System.out.println(user.getLastName()+"111111111111111111111111111111111");
+
+        user.setFirstLogin(true);
 
         Set<Role> roles = new HashSet<>();
 
@@ -155,10 +156,16 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
+
+            // Get the user entity
+            User user = userRepository.findById(userDetails.getId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
             String jwt = jwtUtils.generateJwtToken(userDetails);
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
+
+
 
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
             System.out.println("it is working until this point");
@@ -169,7 +176,8 @@ public class AuthController {
                             userDetails.getId(),
                             userDetails.getUsername(),
                             userDetails.getEmail(),
-                            roles
+                            roles,
+                            user.getFirstLogin()
                     ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -178,10 +186,18 @@ public class AuthController {
     }
 
 
+
+
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(@RequestBody LogOutRequest logOutRequest) {
-        refreshTokenService.deleteByUserId(logOutRequest.getUserId());
+    public ResponseEntity<?> logout(
+            @RequestHeader("Authorization") String token) {
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+        User user = userRepository.findByUsername(username).orElseThrow(()->new RuntimeException("User not found"));
+        System.out.println(user.getId()==null ? "null" : user.getId()+"5555555555555555555555555");
+        refreshTokenService.deleteByUserId(user.getId());
         return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+
+
     }
 
 

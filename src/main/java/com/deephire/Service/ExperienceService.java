@@ -1,5 +1,6 @@
 package com.deephire.Service;
 
+import com.deephire.Models.Profile;
 import com.deephire.Repositories.ExperienceRepository;
 import com.deephire.Models.Experience;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,4 +22,10 @@ public class ExperienceService {
     public Experience update(Experience experience) { return experienceRepository.saveAndFlush(experience); }
 
     public List<Experience> findAll() { return experienceRepository.findAll(); }
+
+    public List<Experience> saveAllExperiencesWithProfile(List<Experience> experiences, Profile profile) {
+        experiences.forEach(experience -> experience.setProfile(profile));
+        return experienceRepository.saveAll(experiences);
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.deephire.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,8 +19,10 @@ public class StatusOfCv {
     private String state;
 
     @ManyToOne
-    private User User;
+    @JsonBackReference("user-status")
+    private User user;
 
     @ManyToOne
+    @JsonBackReference("jobposting-status")
     private JobPosting jobPosting;
 }

@@ -1,5 +1,6 @@
 package com.deephire.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,8 +20,10 @@ public class Comment {
     private Date timestamp;
 
     @ManyToOne
+    @JsonBackReference("post-comment")
     private Post post;
 
     @ManyToOne
+    @JsonBackReference("user-comment")
     private User user;
 }

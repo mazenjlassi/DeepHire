@@ -1,7 +1,11 @@
 package com.deephire.Controllers;
 
 
-import com.deephire.Service.ProfileService;
+import com.deephire.JWT.JwtUtils;
+import com.deephire.Models.User;
+import com.deephire.Repositories.UserRepository;
+import com.deephire.Request.ProfileCompletionRequest;
+import com.deephire.Service.*;
 import com.deephire.Models.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +20,24 @@ public class ProfileRestController {
 
     @Autowired
     private ProfileService profileService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private SkillService skillService;
+
+    @Autowired
+    private ExperienceService experienceService;
+
+    @Autowired
+    private EducationService educationService;
+
+    @Autowired
+    private CertificationService certificationService;
 
     @PostMapping("/add")
     public ResponseEntity<Profile> add(@RequestBody Profile profile) {
@@ -72,5 +94,68 @@ public class ProfileRestController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+
+    @PostMapping("/complete-profile")
+    public ResponseEntity<?> completeProfile(
+            @RequestHeader("Authorization") String token,
+            @RequestBody ProfileCompletionRequest request) {
+
+
+
+        try {
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            user.setBio(request.getBio());
+            user.setLocation(request.getLocation());
+            user.setFirstLogin(true);
+
+            Profile profile = user.getProfile();
+            if (profile == null) {
+                profile = new Profile();
+                profile.setUser(user);
+            }
+
+            profile.setHeadline(request.getHeadline());
+            profile.setSummary(request.getSummary());
+
+            // Sauvegarder d'abord le profil
+            Profile savedProfile = profileService.add(profile);
+
+            // Ensuite, sauvegarder les listes liées
+            if (request.getSkills() != null)
+                skillService.saveAllSkillsWithProfile(request.getSkills(), savedProfile);
+            if (request.getExperiences() != null)
+                experienceService.saveAllExperiencesWithProfile(request.getExperiences(), savedProfile);
+            if (request.getEducation() != null)
+                educationService.saveAllEducationWithProfile(request.getEducation(), savedProfile);
+            if (request.getCertifications() != null)
+                certificationService.saveAllCertificationsWithProfile(request.getCertifications(), savedProfile);
+
+            user.setProfile(savedProfile);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(new MessageResponse("Profile completed successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Error completing profile: " + e.getMessage()));
+        }
+    }
+
+
+    @PostMapping("/skip-profile")
+    public ResponseEntity<?> skipProfileCompletion(
+            @RequestHeader("Authorization") String token) {
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+        User user = userRepository.findByUsername(username).orElseThrow(()->new RuntimeException("User not found"));
+
+        user.setFirstLogin(false);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new MessageResponse("Profile completion skipped"));
     }
 }

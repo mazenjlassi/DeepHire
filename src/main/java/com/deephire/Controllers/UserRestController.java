@@ -1,6 +1,8 @@
 package com.deephire.Controllers;
 
 
+import com.deephire.JWT.JwtUtils;
+import com.deephire.Service.MessageResponse;
 import com.deephire.Service.UserService;
 import com.deephire.Models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -18,6 +21,9 @@ public class UserRestController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @PostMapping("/add")
     public ResponseEntity<User> add(@RequestBody User user) {
@@ -100,4 +106,34 @@ public class UserRestController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
+
+
+
+    @GetMapping("/me")
+    public ResponseEntity<User> getCurrentUser(
+            @RequestHeader("Authorization") String token) {
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+        User user = userService.findByUsername(username);
+
+        // Create a response DTO without password
+        User responseUser = new User();
+        responseUser.setId(user.getId());
+        responseUser.setUsername(user.getUsername());
+        responseUser.setEmail(user.getEmail());
+        responseUser.setFirstName(user.getFirstName());
+        responseUser.setLastName(user.getLastName());
+        responseUser.setBio(user.getBio());
+        responseUser.setLocation(user.getLocation());
+        responseUser.setProfilePicture(user.getProfilePicture());
+        responseUser.setBackGroundImage(user.getBackGroundImage());
+        responseUser.setFirstLogin(user.getFirstLogin());
+        responseUser.setProfile(user.getProfile());
+
+        return ResponseEntity.ok(responseUser);
+    }
+
+
 }
