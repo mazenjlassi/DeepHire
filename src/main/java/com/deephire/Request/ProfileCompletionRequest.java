@@ -8,6 +8,7 @@ import com.deephire.Models.Experience;
 import com.deephire.Models.Profile.*;
 import com.deephire.Models.Skill;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -94,4 +95,26 @@ public class ProfileCompletionRequest {
     public void setCertifications(List<Certification> certifications) {
         this.certifications = certifications;
     }
+
+    private MultipartFile profilePicture;
+    private MultipartFile backGroundImage;
+
+    // Getters and Setters (existing ones remain the same)
+
+    public MultipartFile getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(MultipartFile profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public MultipartFile getBackGroundImage() {
+        return backGroundImage;
+    }
+
+    public void setBackGroundImage(MultipartFile backGroundImage) {
+        this.backGroundImage = backGroundImage;
+    }
+
 }

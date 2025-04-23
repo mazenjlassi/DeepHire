@@ -15,7 +15,9 @@ public class Media {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String url;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    byte[] files;
 
     @ManyToOne
     @JsonBackReference("post-media")

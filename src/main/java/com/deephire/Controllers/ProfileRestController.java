@@ -7,10 +7,13 @@ import com.deephire.Repositories.UserRepository;
 import com.deephire.Request.ProfileCompletionRequest;
 import com.deephire.Service.*;
 import com.deephire.Models.Profile;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -97,15 +100,17 @@ public class ProfileRestController {
     }
 
 
-
-    @PostMapping("/complete-profile")
+    @PostMapping(value = "/complete-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> completeProfile(
             @RequestHeader("Authorization") String token,
-            @RequestBody ProfileCompletionRequest request) {
-
-
+            @RequestPart("profileData") String profileDataJson,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture,
+            @RequestPart(value = "backGroundImage", required = false) MultipartFile backGroundImage) {
 
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ProfileCompletionRequest request = objectMapper.readValue(profileDataJson, ProfileCompletionRequest.class);
+
             String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
@@ -113,6 +118,16 @@ public class ProfileRestController {
             user.setBio(request.getBio());
             user.setLocation(request.getLocation());
             user.setFirstLogin(true);
+
+            // Handle profile picture
+            if (profilePicture != null && !profilePicture.isEmpty()) {
+                user.setProfilePicture(profilePicture.getBytes());
+            }
+
+            // Handle background image
+            if (backGroundImage != null && !backGroundImage.isEmpty()) {
+                user.setBackGroundImage(backGroundImage.getBytes());
+            }
 
             Profile profile = user.getProfile();
             if (profile == null) {
@@ -137,7 +152,10 @@ public class ProfileRestController {
                 certificationService.saveAllCertificationsWithProfile(request.getCertifications(), savedProfile);
 
             user.setProfile(savedProfile);
+
+            user.setFirstLogin(false);
             userRepository.save(user);
+
 
             return ResponseEntity.ok(new MessageResponse("Profile completed successfully"));
         } catch (Exception e) {

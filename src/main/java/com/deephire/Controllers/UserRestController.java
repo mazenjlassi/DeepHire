@@ -2,6 +2,7 @@ package com.deephire.Controllers;
 
 
 import com.deephire.JWT.JwtUtils;
+import com.deephire.Repositories.UserRepository;
 import com.deephire.Service.MessageResponse;
 import com.deephire.Service.UserService;
 import com.deephire.Models.User;
@@ -18,6 +19,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class UserRestController {
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
@@ -95,6 +98,49 @@ public class UserRestController {
             return new ResponseEntity<>("Update failed: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
+    @PutMapping(value = "/update-my-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateCurrentUser(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("email") String email,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam(value = "bio", required = false) String bio,
+            @RequestParam(value = "location", required = false) String location,
+            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
+            @RequestParam(value = "backGroundImage", required = false) MultipartFile backGroundImage
+    ) {
+
+        try {
+
+            String userNameFromJwtToken = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            User existingUser = userRepository.findByUsername(userNameFromJwtToken).orElseThrow(()->new RuntimeException("User not found"));
+
+            existingUser.setUsername(userNameFromJwtToken);
+            existingUser.setEmail(email);
+            existingUser.setFirstName(firstName);
+            existingUser.setLastName(lastName);
+            existingUser.setBio(bio);
+            existingUser.setLocation(location);
+
+            if (profilePicture != null && !profilePicture.isEmpty()) {
+                existingUser.setProfilePicture(profilePicture.getBytes());
+            }
+
+            if (backGroundImage != null && !backGroundImage.isEmpty()) {
+                existingUser.setBackGroundImage(backGroundImage.getBytes());
+            }
+
+            userService.update(existingUser); // You need an update method in your service/repo
+            return ResponseEntity.ok(existingUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Update failed: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 
     @DeleteMapping("/delete/{id}")
