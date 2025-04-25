@@ -5,6 +5,8 @@ import com.deephire.Repositories.UserRepository;
 import com.deephire.Models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +16,13 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
 
 
-
+    @Autowired
+    private JavaMailSender mailSender;
 
 
     public User add(User user) { return userRepository.save(user); }
@@ -31,6 +35,16 @@ public class UserService {
 
     public List<User> findAll() { return userRepository.findAll(); }
     public  User findByUsername(String username) {return  userRepository.findByUsername(username).get();}
+
+
+    public void sendEmail(User user) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Welcome!");
+        message.setText("Hello " + user.getUsername() + ",\n\nWelcome to our platform!");
+
+        mailSender.send(message);
+    }
 
 
 }

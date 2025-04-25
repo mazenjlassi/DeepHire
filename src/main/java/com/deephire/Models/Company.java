@@ -25,7 +25,7 @@ public class Company {
 
     @OneToOne
     @JoinColumn(name = "admin_id")
-    @JsonBackReference("company-admin")
+    @JsonBackReference("admin-company")
     private AdminCompany admin;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)

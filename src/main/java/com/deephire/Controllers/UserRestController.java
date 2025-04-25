@@ -177,7 +177,7 @@ public class UserRestController {
         responseUser.setBackGroundImage(user.getBackGroundImage());
         responseUser.setFirstLogin(user.getFirstLogin());
         responseUser.setProfile(user.getProfile());
-
+        responseUser.setRoles(user.getRoles());
         return ResponseEntity.ok(responseUser);
     }
 
