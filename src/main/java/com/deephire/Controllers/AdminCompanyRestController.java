@@ -83,14 +83,18 @@ public class AdminCompanyRestController {
             // Now save only the user
             adminCompanyService.update(user);
             // (company will be saved automatically if you have CascadeType.ALL)
-
-            return ResponseEntity.ok().body("Company profile completed successfully");
-
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new MessageResponse("Company profile completed successfully"));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error completing company profile: " + e.getMessage());
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new MessageResponse("error  "));
         }
-    }
+
+        }
 
 
     @PostMapping("/add")
