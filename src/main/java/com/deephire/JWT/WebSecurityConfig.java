@@ -52,12 +52,14 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter (if leg
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
+        http
+                .cors() // ✅ Enables Spring Security CORS support using the CorsFilter bean
+                .and()
+                .csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/test/**").permitAll()
+                .requestMatchers("/api/auth/**", "/ws/**", "/api/test/**").permitAll()
                 .anyRequest().authenticated();
 
         http.authenticationProvider(authenticationProvider());
@@ -65,4 +67,5 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter (if leg
 
         return http.build();
     }
+
 }
