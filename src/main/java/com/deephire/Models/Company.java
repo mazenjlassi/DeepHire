@@ -23,6 +23,21 @@ public class Company {
     private String industry;
     private String location;
 
+
+    private String description;
+
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] logo;
+
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] backgroundImage;
+
+
+
     @OneToOne
     @JoinColumn(name = "admin_id")
     @JsonBackReference("admin-company")

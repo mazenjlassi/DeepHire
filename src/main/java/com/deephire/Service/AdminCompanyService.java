@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import java.nio.CharBuffer;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminCompanyService {
@@ -23,11 +25,7 @@ public class AdminCompanyService {
     private UserRepository userRepository;
 
 
-
-
-
-
-    public List<AdminCompany>  all() {
+    public List<AdminCompany> all() {
         return adminCompanyRepository.findAll();
     }
 
@@ -46,4 +44,10 @@ public class AdminCompanyService {
     public AdminCompany findById(Long id) {
         return adminCompanyRepository.findById(id).orElse(null);
     }
+
+
+    public Optional<AdminCompany> findByUsername(String username){
+        return adminCompanyRepository.findByUsername(username);
+    }
+
 }

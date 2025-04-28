@@ -1,12 +1,25 @@
 package com.deephire.Controllers;
 
 
+import com.deephire.Dto.CompanyDto;
+import com.deephire.JWT.JwtUtils;
+import com.deephire.Models.Company;
+import com.deephire.Models.Profile;
+import com.deephire.Models.User;
+import com.deephire.Repositories.UserRepository;
+import com.deephire.Request.ProfileCompletionRequest;
 import com.deephire.Service.AdminCompanyService;
 import com.deephire.Models.AdminCompany;
+import com.deephire.Service.CommentService;
+import com.deephire.Service.CompanyService;
+import com.deephire.Service.MessageResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,9 +30,67 @@ public class AdminCompanyRestController {
     @Autowired
     private AdminCompanyService adminCompanyService;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private CommentService commentService;
+    @Autowired
+    private CompanyService companyService;
 
+    @PostMapping(value = "/complete-profile-company", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> completeProfile(
+            @RequestHeader("Authorization") String token,
+            @RequestPart("profileData") String companyDataJson,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile logoCompany,
+            @RequestPart(value = "backGroundImage", required = false) MultipartFile backGroundImage) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            CompanyDto companyRequest = objectMapper.readValue(companyDataJson, CompanyDto.class);
 
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            AdminCompany user = adminCompanyService.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
+            // Create new company or use existing
+            Company company = user.getCompany();
+            if (company == null) {
+                company = new Company();
+            }
+
+            // Fill company details
+            company.setName(companyRequest.getName());
+            company.setIndustry(companyRequest.getIndustry());
+            company.setLocation(companyRequest.getLocation());
+            company.setDescription(companyRequest.getDescription());
+
+            if (logoCompany != null && !logoCompany.isEmpty()) {
+                company.setLogo(logoCompany.getBytes());
+            }
+
+            if (backGroundImage != null && !backGroundImage.isEmpty()) {
+                company.setBackgroundImage(backGroundImage.getBytes());
+            }
+
+            // Set the bi-directional relationship
+            company.setAdmin(user);     // Company → User
+            user.setCompany(company);   // User → Company
+
+            // User firstLogin
+            user.setFirstLogin(false);
+
+            // Now save only the user
+            adminCompanyService.update(user);
+            // (company will be saved automatically if you have CascadeType.ALL)
+
+            return ResponseEntity.ok().body("Company profile completed successfully");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error completing company profile: " + e.getMessage());
+        }
+    }
 
 
     @PostMapping("/add")
