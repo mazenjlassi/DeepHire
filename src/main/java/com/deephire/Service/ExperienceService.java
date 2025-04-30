@@ -28,4 +28,8 @@ public class ExperienceService {
         return experienceRepository.saveAll(experiences);
     }
 
+    public  void  delete(Experience experience) {
+        experienceRepository.delete(experience);
+    }
+
 }

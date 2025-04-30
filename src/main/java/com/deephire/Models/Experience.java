@@ -18,8 +18,8 @@ public class Experience {
     private Long id;
     private String companyName;
     private String title;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
     private String description;
 
     @ManyToOne

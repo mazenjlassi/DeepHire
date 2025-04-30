@@ -28,4 +28,8 @@ public class EducationService {
         return educationRepository.saveAll(educationList);
     }
 
+    public  void  delete(Education education) {
+        educationRepository.delete(education);
+    }
+
 }

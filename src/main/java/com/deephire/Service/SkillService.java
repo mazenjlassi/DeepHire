@@ -28,4 +28,8 @@ public class SkillService {
         return skillRepository.saveAll(skills);
     }
 
+    public  void  delete(Skill skill) {
+        skillRepository.delete(skill);
+    }
+
 }

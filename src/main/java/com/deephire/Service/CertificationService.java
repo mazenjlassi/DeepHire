@@ -28,5 +28,8 @@ public class CertificationService {
         certifications.forEach(certification -> certification.setProfile(profile));
         return certificationRepository.saveAll(certifications);
     }
+    public  void  delete(Certification certification){
+        certificationRepository.delete(certification);
+    }
 
 }
