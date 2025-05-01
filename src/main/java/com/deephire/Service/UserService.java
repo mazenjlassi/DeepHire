@@ -1,6 +1,7 @@
 package com.deephire.Service;
 
 
+import com.deephire.Dto.UserSearchDTO;
 import com.deephire.Repositories.UserRepository;
 import com.deephire.Models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,11 @@ public class UserService {
         message.setText("Hello " + user.getUsername() + ",\n\nWelcome to our platform!");
 
         mailSender.send(message);
+    }
+
+
+    public List<UserSearchDTO> searchUsers(String searchText) {
+        return userRepository.searchUsersByFullNameStartsWith(searchText);
     }
 
 

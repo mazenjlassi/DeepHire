@@ -1,6 +1,7 @@
 package com.deephire.Controllers;
 
 
+import com.deephire.Dto.UserSearchDTO;
 import com.deephire.JWT.JwtUtils;
 import com.deephire.Models.Skill;
 import com.deephire.Repositories.UserRepository;
@@ -182,6 +183,11 @@ public class UserRestController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserSearchDTO>> searchUsers(@RequestParam String q) {
+        return ResponseEntity.ok(userService.searchUsers(q));
     }
 
 
