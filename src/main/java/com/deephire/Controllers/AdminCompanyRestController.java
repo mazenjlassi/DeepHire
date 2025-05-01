@@ -78,7 +78,7 @@ public class AdminCompanyRestController {
             user.setCompany(company);   // User → Company
 
             // User firstLogin
-            user.setFirstLogin(false);
+
 
             // Now save only the user
             adminCompanyService.update(user);
