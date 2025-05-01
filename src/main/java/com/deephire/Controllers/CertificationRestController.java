@@ -156,7 +156,7 @@ public class CertificationRestController {
 
             Profile profile = user.getProfile();
             if (profile == null || profile.getCertifications() == null) {
-                return new ResponseEntity<>("No certifications found", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
 
             Certification certToRemove = profile.getCertifications().stream()
@@ -166,15 +166,15 @@ public class CertificationRestController {
                     .orElse(null);
 
             if (certToRemove == null) {
-                return new ResponseEntity<>("Certification not found", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
 
             profile.getCertifications().remove(certToRemove);
             certificationService.delete(certToRemove);
 
-            return new ResponseEntity<>("Certification deleted successfully", HttpStatus.OK);
+            return ResponseEntity.ok(true);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error deleting certification", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

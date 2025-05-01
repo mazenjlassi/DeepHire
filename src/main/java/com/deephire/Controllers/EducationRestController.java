@@ -2,8 +2,10 @@ package com.deephire.Controllers;
 
 
 import com.deephire.Dto.EducationDto;
+import com.deephire.Dto.SkillDto;
 import com.deephire.JWT.JwtUtils;
 import com.deephire.Models.Profile;
+import com.deephire.Models.Skill;
 import com.deephire.Models.User;
 import com.deephire.Repositories.ProfileRepository;
 import com.deephire.Repositories.UserRepository;
@@ -160,7 +162,7 @@ public class EducationRestController {
 
             Profile profile = user.getProfile();
             if (profile == null || profile.getEducation() == null) {
-                return new ResponseEntity<>("No education entries found", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
 
             Education educationToRemove = profile.getEducation().stream()
@@ -171,15 +173,15 @@ public class EducationRestController {
                     .orElse(null);
 
             if (educationToRemove == null) {
-                return new ResponseEntity<>("Education not found", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
 
             profile.getEducation().remove(educationToRemove);
             educationService.delete(educationToRemove);
 
-            return new ResponseEntity<>("Education deleted successfully", HttpStatus.OK);
+            return ResponseEntity.ok(true);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error deleting education", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

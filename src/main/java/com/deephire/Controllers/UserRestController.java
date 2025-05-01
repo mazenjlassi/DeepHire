@@ -2,6 +2,7 @@ package com.deephire.Controllers;
 
 
 import com.deephire.JWT.JwtUtils;
+import com.deephire.Models.Skill;
 import com.deephire.Repositories.UserRepository;
 import com.deephire.Service.MessageResponse;
 import com.deephire.Service.UserService;
@@ -50,16 +51,7 @@ public class UserRestController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable Long id) {
-        User user = userService.find(id);
-        if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+    
 
     @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateUser(
@@ -179,6 +171,17 @@ public class UserRestController {
         responseUser.setProfile(user.getProfile());
         responseUser.setRoles(user.getRoles());
         return ResponseEntity.ok(responseUser);
+    }
+
+
+    @GetMapping("/{username}")
+    public ResponseEntity<User> findByUsername(@PathVariable String username) {
+        try {
+            User user = userService.findByUsername(username);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 

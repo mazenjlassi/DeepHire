@@ -163,7 +163,7 @@ public class ExperienceRestController {
 
             Profile profile = user.getProfile();
             if (profile == null || profile.getExperiences() == null) {
-                return new ResponseEntity<>("No experiences found", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
 
             Experience experienceToRemove = profile.getExperiences().stream()
@@ -173,15 +173,15 @@ public class ExperienceRestController {
                     .orElse(null);
 
             if (experienceToRemove == null) {
-                return new ResponseEntity<>("Experience not found", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
 
             profile.getExperiences().remove(experienceToRemove);
             experienceService.delete(experienceToRemove);
 
-            return new ResponseEntity<>("Experience deleted successfully", HttpStatus.OK);
+            return ResponseEntity.ok(true);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error deleting experience", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

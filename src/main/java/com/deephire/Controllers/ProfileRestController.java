@@ -5,6 +5,7 @@ import com.deephire.JWT.JwtUtils;
 import com.deephire.Models.User;
 import com.deephire.Repositories.UserRepository;
 import com.deephire.Request.ProfileCompletionRequest;
+import com.deephire.Request.ProfileUpdateRequest;
 import com.deephire.Service.*;
 import com.deephire.Models.Profile;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -175,5 +176,58 @@ public class ProfileRestController {
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("Profile completion skipped"));
+    }
+
+
+
+    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateProfile(
+            @RequestHeader("Authorization") String token,
+            @RequestPart("profileData") String profileDataJson,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture,
+            @RequestPart(value = "backGroundImage", required = false) MultipartFile backGroundImage) {
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ProfileUpdateRequest request = objectMapper.readValue(profileDataJson, ProfileUpdateRequest.class);
+
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Update basic user info
+            user.setFirstName(request.getFirstName());
+            user.setLastName(request.getLastName());
+            user.setBio(request.getBio());
+            user.setLocation(request.getLocation());
+
+            // Handle profile picture upload
+            if (profilePicture != null && !profilePicture.isEmpty()) {
+                user.setProfilePicture(profilePicture.getBytes());
+            }
+
+            // Handle background image upload
+            if (backGroundImage != null && !backGroundImage.isEmpty()) {
+                user.setBackGroundImage(backGroundImage.getBytes());
+            }
+
+            // Update profile-specific fields
+            Profile profile = user.getProfile();
+            if (profile == null) {
+                profile = new Profile();
+                profile.setUser(user);
+            }
+            profile.setHeadline(request.getHeadline());
+            profile.setSummary(request.getSummary());
+
+            // Save changes
+            profileService.update(profile);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(new MessageResponse("Profile updated successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error updating profile: " + e.getMessage()));
+        }
     }
 }
