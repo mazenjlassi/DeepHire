@@ -9,6 +9,6 @@ public class UserSearchDTO {
     private String username;
     private String firstName;
     private String lastName;
-
+    private String profileHeadline;
 
 }

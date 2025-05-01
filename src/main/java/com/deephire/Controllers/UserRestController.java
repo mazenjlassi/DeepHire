@@ -185,10 +185,17 @@ public class UserRestController {
         }
     }
 
+//    @GetMapping("/search")
+//    public ResponseEntity<List<UserSearchDTO>> searchUsers(@RequestParam String q) {
+//        return ResponseEntity.ok(userService.searchUsers(q));
+//    }
+
+
     @GetMapping("/search")
     public ResponseEntity<List<UserSearchDTO>> searchUsers(@RequestParam String q) {
         return ResponseEntity.ok(userService.searchUsers(q));
     }
+
 
 
 }

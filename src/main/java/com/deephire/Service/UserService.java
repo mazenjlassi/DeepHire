@@ -49,7 +49,7 @@ public class UserService {
 
 
     public List<UserSearchDTO> searchUsers(String searchText) {
-        return userRepository.searchUsersByFullNameStartsWith(searchText);
+        return userRepository.searchUsers(searchText);
     }
 
 
