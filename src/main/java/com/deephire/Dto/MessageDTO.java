@@ -12,13 +12,17 @@ public class MessageDTO {
     private String senderUsername; // Must match Angular
     private String receiverUsername; // Must match Angular
     private Date timestamp;
+    private String firstName;
+    private String lastName;
 
-    public MessageDTO(String content, Date timestamp, String senderUsername, String receiverUsername) {
+    public MessageDTO(String content, Date timestamp, String senderUsername, String receiverUsername,String firstName, String lastName) {
 
         this.content = content;
         this.timestamp = timestamp;
         this.senderUsername = senderUsername;
         this.receiverUsername = receiverUsername;
+        this.firstName = firstName;
+        this.lastName = lastName;
 
     }
 

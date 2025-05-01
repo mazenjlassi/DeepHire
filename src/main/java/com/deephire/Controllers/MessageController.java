@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -70,11 +71,14 @@ public class MessageController {
         List<Message> conversation = messageRepository.findMessagesBetweenUsers(currentUsername, contactUsername);
 
         // Map Message entities to MessageDto objects
+
         List<MessageDTO> messageDtos = conversation.stream().map(msg -> new MessageDTO(
                 msg.getContent(),
                 msg.getTimestamp(),
                 msg.getSender().getUsername(),
-                msg.getReceiver().getUsername()
+                msg.getReceiver().getUsername(),
+                msg.getSender().getFirstName(),
+                msg.getSender().getLastName()
         )).collect(Collectors.toList());
 
         return ResponseEntity.ok(messageDtos);

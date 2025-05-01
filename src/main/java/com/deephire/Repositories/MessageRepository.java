@@ -29,7 +29,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("""
     SELECT DISTINCT new com.deephire.Dto.ConversationPartnerDto(
         CASE WHEN m.sender.id = :userId THEN m.receiver.id ELSE m.sender.id END,
-        CASE WHEN m.sender.id = :userId THEN m.receiver.username ELSE m.sender.username END
+        CASE WHEN m.sender.id = :userId THEN m.receiver.username ELSE m.sender.username END,
+        CASE WHEN m.sender.id = :userId THEN m.receiver.firstName ELSE m.sender.firstName END,
+        CASE WHEN m.sender.id = :userId THEN m.receiver.lastName ELSE m.sender.lastName END
     )
     FROM Message m
     WHERE m.sender.id = :userId OR m.receiver.id = :userId
