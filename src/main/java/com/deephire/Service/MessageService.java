@@ -1,7 +1,9 @@
 package com.deephire.Service;
 
+import com.deephire.Models.User;
 import com.deephire.Repositories.MessageRepository;
 import com.deephire.Models.Message;
+import com.deephire.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,9 @@ import java.util.List;
 public class MessageService {
     @Autowired
     private MessageRepository messageRepository;
+    @Autowired
+    private UserRepository userRepository;
+
 
     public Message add(Message message) { return messageRepository.save(message); }
 
