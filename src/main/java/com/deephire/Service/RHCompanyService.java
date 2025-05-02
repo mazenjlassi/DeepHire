@@ -1,5 +1,6 @@
 package com.deephire.Service;
 
+import com.deephire.Models.Company;
 import com.deephire.Models.RHCompany;
 import com.deephire.Models.User;
 import com.deephire.Repositories.RHCompanyRepository;
@@ -34,7 +35,7 @@ public class RHCompanyService {
     @Autowired
     EmailService emailService;
 
-    public RHCompany add(RHCompany rhCompany) {
+    public RHCompany add(RHCompany rhCompany, Company company) {
         String rawPassword = rhCompany.getPassword();
 
         rhCompany.setPassword(passwordEncoder.encode(rawPassword));
@@ -43,6 +44,7 @@ public class RHCompanyService {
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         rhCompany.setRoles(Collections.singleton(recruiterRole));
+        rhCompany.setCompany(company);
         RHCompany saved = rhCompanyRepository.save(rhCompany);
 
         emailService.sendWelcomeEmail(rhCompany.getEmail(), rhCompany.getUsername(), rawPassword);

@@ -57,6 +57,7 @@ public class AdminCompanyRestController {
             Company company = user.getCompany();
             if (company == null) {
                 company = new Company();
+                user.setCompany(company);
             }
 
             // Fill company details

@@ -7,9 +7,9 @@ import java.util.Date;
 @Data
 public class JobPostingRequestDTO {
     private String title;
-    private String description;
-    private String requirements;
-    private String location;
-    private Date datePosted;
+        private String description;
+        private String requirements;
+        private String location;
+        private Date datePosted;
 
-}
+    }

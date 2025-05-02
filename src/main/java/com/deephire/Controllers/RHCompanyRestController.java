@@ -1,6 +1,12 @@
 package com.deephire.Controllers;
 
+import com.deephire.Dto.SkillDto;
+import com.deephire.JWT.JwtUtils;
+import com.deephire.Models.AdminCompany;
+import com.deephire.Models.Company;
 import com.deephire.Models.User;
+import com.deephire.Repositories.AdminCompanyRepository;
+import com.deephire.Repositories.CompanyRepository;
 import com.deephire.Repositories.UserRepository;
 import com.deephire.Service.EmailService;
 import com.deephire.Service.RHCompanyService;
@@ -18,6 +24,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/rh-companies")
 public class RHCompanyRestController {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+
+    @Autowired
+    private CompanyRepository companyRepository;
 
 
     @Autowired
@@ -42,11 +58,21 @@ public class RHCompanyRestController {
 
     @Autowired
     EmailService  emailService;
+    @Autowired
+    private AdminCompanyRepository adminCompanyRepository;
+
 
     @PostMapping("/add")
-    public ResponseEntity<RHCompany> add(@RequestBody RHCompany rhCompany) {
+    public ResponseEntity<RHCompany> add(@RequestBody RHCompany rhCompany,
+                    @RequestHeader("Authorization") String token) {
         try {
-            RHCompany newRHCompany = rhCompanyService.add(rhCompany);
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            AdminCompany user = adminCompanyRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+
+            Company company = companyRepository.getCompanyByAdmin(user);
+            RHCompany newRHCompany = rhCompanyService.add(rhCompany,company);
 
 
             // Send email directly
