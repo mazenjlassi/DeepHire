@@ -19,6 +19,7 @@ public class Profile {
     private Long id;
 
     private String headline;
+    @Column(length = 1000)
     private String summary;
 
     @OneToOne
