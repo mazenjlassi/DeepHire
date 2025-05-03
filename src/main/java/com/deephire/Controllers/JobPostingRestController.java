@@ -2,6 +2,7 @@ package com.deephire.Controllers;
 
 
 import com.deephire.Dto.JobPostingRequestDTO;
+import com.deephire.Dto.JobPostingUpdateWrapperDTO;
 import com.deephire.JWT.JwtUtils;
 import com.deephire.Models.*;
 import com.deephire.Repositories.AdminCompanyRepository;
@@ -152,6 +153,25 @@ public class JobPostingRestController {
 
 
 
+    @PostMapping("/delete-by-dto")
+    public ResponseEntity<Boolean> deleteJobPosting(@RequestBody JobPostingRequestDTO dto) {
+        try {
+            return jobPostingRepository
+                    .findByTitleAndDescriptionAndRequirementsAndLocationAndDatePosted(
+                            dto.getTitle(),
+                            dto.getDescription(),
+                            dto.getRequirements(),
+                            dto.getLocation(),
+                            dto.getDatePosted()
+                    ).map(jobPosting -> {
+                        jobPostingRepository.delete(jobPosting);
+                        return ResponseEntity.ok(true);
+                    })
+                    .orElseGet(() -> ResponseEntity.status(404).body(false));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(false);
+        }
+    }
 
     @GetMapping("/get-job-posting")
     public ResponseEntity<?> getJobPosting(@RequestHeader("Authorization") String token) {
@@ -198,4 +218,36 @@ public class JobPostingRestController {
                     .body("An error occurred while retrieving job postings: " + e.getMessage());
         }
     }
+
+
+    @PutMapping("/update")
+    public ResponseEntity<Boolean> updateJobPosting(@RequestBody JobPostingUpdateWrapperDTO wrapper) {
+        try {
+            JobPostingRequestDTO original = wrapper.getOriginal();
+            JobPostingRequestDTO updated = wrapper.getUpdated();
+
+            return jobPostingRepository
+                    .findByTitleAndDescriptionAndRequirementsAndLocationAndDatePosted(
+                            original.getTitle(),
+                            original.getDescription(),
+                            original.getRequirements(),
+                            original.getLocation(),
+                            original.getDatePosted()
+                    )
+                    .map(existingJob -> {
+                        existingJob.setTitle(updated.getTitle());
+                        existingJob.setDescription(updated.getDescription());
+                        existingJob.setRequirements(updated.getRequirements());
+                        existingJob.setLocation(updated.getLocation());
+                        existingJob.setDatePosted(updated.getDatePosted());
+
+                        jobPostingRepository.save(existingJob);
+                        return ResponseEntity.ok(true);
+                    })
+                    .orElseGet(() -> ResponseEntity.status(404).body(false));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(false);
+        }
+    }
+
 }
