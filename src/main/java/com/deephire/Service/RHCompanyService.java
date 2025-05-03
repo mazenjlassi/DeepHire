@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,5 +81,10 @@ public class RHCompanyService {
                 .collect(Collectors.toList());
     }
 
+
+    public List<Integer> getRecruitersCountPerMonth(Company company) {
+        int currentYear = LocalDate.now().getYear();
+        return rhCompanyRepository.getRecruiterCountPerMonth(company.getId(), currentYear);
+    }
 
 }

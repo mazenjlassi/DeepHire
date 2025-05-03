@@ -1,11 +1,13 @@
 package com.deephire.Service;
 
 import com.deephire.Dto.JobPostingRequestDTO;
+import com.deephire.Models.Company;
 import com.deephire.Repositories.JobPostingRepository;
 import com.deephire.Models.JobPosting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,6 +43,19 @@ public class JobPostingService {
                 dto.getLocation(),
                 dto.getDatePosted()
         );
+    }
+
+
+
+    public List<Integer> getJobPostingsPerMonth(Company company) {
+        List<Object[]> rawResult = jobPostingRepository.getMonthlyJobPostingsByCompanyNative(company.getId());
+
+        List<Integer> result = new ArrayList<>();
+        for (Object[] row : rawResult) {
+            Number count = (Number) row[1];
+            result.add(count != null ? count.intValue() : 0);
+        }
+        return result;
     }
 
 
