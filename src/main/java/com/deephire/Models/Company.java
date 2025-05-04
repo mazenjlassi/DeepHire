@@ -20,7 +20,10 @@ public class Company {
     private Long id;
 
     private String name;
+
     private String industry;
+
+
     private String location;
 
     @Column(length = 1000)
