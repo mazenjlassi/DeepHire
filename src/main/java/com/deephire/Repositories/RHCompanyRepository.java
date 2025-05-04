@@ -16,6 +16,8 @@ import java.util.List;
 public interface RHCompanyRepository extends JpaRepository<RHCompany, Long> {
     long countByCompany(Company company);
 
+    long count();
+
     @Query(value = """
         SELECT months.month,
                IFNULL(COUNT(u.id), 0) AS count

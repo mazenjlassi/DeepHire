@@ -16,6 +16,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
+    long count();
 
 //    @Query("SELECT new com.deephire.Dto.UserSearchDTO(u.username, u.firstName, u.lastName) " +
 //            "FROM User u WHERE CONCAT(u.firstName, ' ', u.lastName) LIKE CONCAT(:searchText, '%')")
@@ -34,5 +35,22 @@ public interface UserRepository extends JpaRepository<User,Long> {
         OR LOWER(e.companyName) LIKE LOWER(CONCAT('%', :searchText, '%'))
 """)
     List<UserSearchDTO> searchUsers(@Param("searchText") String searchText);
+    @Query(value = """
+        SELECT m.month_num AS month, 
+               COALESCE(COUNT(u.id), 0) AS count
+        FROM (
+            SELECT 1 AS month_num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
+            SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
+            SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
+        ) AS m
+        LEFT JOIN users u ON MONTH(u.created_at) = m.month_num 
+        GROUP BY m.month_num
+        ORDER BY m.month_num
+    """, nativeQuery = true)
+    List<Object[]> getUsersPerMonth();
+
+
+
+
 
 }

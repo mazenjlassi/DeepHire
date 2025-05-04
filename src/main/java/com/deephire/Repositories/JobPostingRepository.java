@@ -47,4 +47,7 @@ public interface JobPostingRepository extends JpaRepository<JobPosting, Long> {
         ORDER BY m.month_num
     """, nativeQuery = true)
     List<Object[]> getMonthlyJobPostingsByCompanyNative(@Param("companyId") Long companyId);
+
+
+
 }

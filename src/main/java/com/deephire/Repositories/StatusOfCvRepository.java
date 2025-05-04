@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface StatusOfCvRepository extends JpaRepository<StatusOfCv,Long> {
 
     long countByJobPosting_Company(Company company);
+
+    long count();
 }

@@ -197,13 +197,23 @@ public class PostRestController {
         List<Post> posts = postService.findAll();
         List<PostDto> dtos = posts.stream().map(p -> {
             User u = p.getUser();
+            String profilePicBase64 = u.getProfilePicture() != null
+                    ? Base64.getEncoder().encodeToString(u.getProfilePicture())
+                    : null;
+
             UserSummaryDto us = new UserSummaryDto(
                     u.getId(), u.getUsername(), u.getFirstName(), u.getLastName(),
-                    Base64.getEncoder().encodeToString(u.getProfilePicture()),null
+                    profilePicBase64, null
             );
-            return new PostDto(p.getId(), p.getContent(), p.getTimestamp(),
-                    p.getLikes(), p.getComments(), p.getMedia(), us);
+
+            return new PostDto(
+                    p.getId(), p.getContent(), p.getTimestamp(),
+                    p.getLikes(), p.getComments(), p.getMedia(), us
+            );
         }).collect(Collectors.toList());
+
         return ResponseEntity.ok(dtos);
     }
+
+
 }
