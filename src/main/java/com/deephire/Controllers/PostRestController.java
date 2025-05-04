@@ -5,11 +5,13 @@ import com.deephire.Dto.UserSummaryDto;
 import com.deephire.JWT.JwtUtils;
 import com.deephire.Models.Media;
 import com.deephire.Models.User;
+import com.deephire.Repositories.PostRepository;
 import com.deephire.Repositories.UserRepository;
 import com.deephire.Request.ProfileCompletionRequest;
 import com.deephire.Service.PostService;
 import com.deephire.Models.Post;
 import com.deephire.Service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,8 @@ public class PostRestController {
     private PostService postService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PostRepository postRepository;
     @Autowired
     private JwtUtils  jwtUtils;
 
@@ -104,15 +108,77 @@ public class PostRestController {
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Post> update(@PathVariable Long id, @RequestBody Post post) {
-        Post existingPost = postService.find(id);
-        if (existingPost != null) {
-            postService.update(post);
-            return new ResponseEntity<>(post, HttpStatus.OK);
+
+    @PutMapping("/update/{postId}")
+    public ResponseEntity<?> updatePost(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long postId,
+            @RequestParam("content") String content,
+            @RequestPart(value = "mediaFiles", required = false) List<MultipartFile> mediaFiles,
+            @RequestParam(value = "remainingMediaIds", required = false) String remainingMediaIdsJson) {
+
+        try {
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new RuntimeException("Post not found"));
+
+            if (!post.getUser().getId().equals(user.getId())) {
+                return new ResponseEntity<>("You are not authorized to update this post", HttpStatus.FORBIDDEN);
+            }
+
+            post.setContent(content);
+            post.setTimestamp(new Date());
+
+            // Handle remaining media
+            List<Long> remainingMediaIds;
+            if (remainingMediaIdsJson != null && !remainingMediaIdsJson.isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                remainingMediaIds = mapper.readValue(remainingMediaIdsJson, new TypeReference<List<Long>>() {});
+            } else {
+                remainingMediaIds = new ArrayList<>();
+            }
+
+            // Filter old media
+            List<Media> filteredMedia = post.getMedia().stream()
+                    .filter(m -> remainingMediaIds.contains(m.getId()))
+                    .collect(Collectors.toList());
+
+            // Process new media files
+            if (mediaFiles != null && !mediaFiles.isEmpty()) {
+                for (MultipartFile file : mediaFiles) {
+                    if (!file.isEmpty()) {
+                        Media media = new Media();
+                        media.setFiles(file.getBytes());
+                        media.setPost(post);
+                        filteredMedia.add(media);
+                    }
+                }
+            }
+
+            post.setMedia(filteredMedia);
+            Post updatedPost = postService.add(post);
+
+            return ResponseEntity.ok(updatedPost);
+
+        } catch (IOException e) {
+            return new ResponseEntity<>("Error processing media files", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+
+
+//    @PutMapping("/update/{id}")
+//    public ResponseEntity<Post> update2(@PathVariable Long id, @RequestBody Post post) {
+//        Post existingPost = postService.find(id);
+//        if (existingPost != null) {
+//            postService.update(post);
+//            return new ResponseEntity<>(post, HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable Long id) {
