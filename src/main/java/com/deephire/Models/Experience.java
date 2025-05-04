@@ -20,6 +20,7 @@ public class Experience {
     private String title;
     private Date startDate;
     private Date endDate;
+    @Column(length = 1000)
     private String description;
 
     @ManyToOne

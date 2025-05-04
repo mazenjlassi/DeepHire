@@ -1,6 +1,7 @@
 package com.deephire.Controllers;
 
 
+import com.deephire.Dto.JobCompanyDTO;
 import com.deephire.Dto.JobPostingRequestDTO;
 import com.deephire.Dto.JobPostingUpdateWrapperDTO;
 import com.deephire.JWT.JwtUtils;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -54,13 +56,26 @@ public class JobPostingRestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<JobPosting>> all() {
+    public ResponseEntity<?> all() {
         try {
             List<JobPosting> jobPostings = jobPostingService.findAll();
             if (jobPostings.isEmpty()) {
                 return new ResponseEntity<>(jobPostings, HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(jobPostings, HttpStatus.OK);
+            List<JobCompanyDTO> responseDTOs = jobPostings.stream().map(job -> {
+                JobCompanyDTO dto = new JobCompanyDTO();
+                dto.setTitle(job.getTitle());
+                dto.setDescription(job.getDescription());
+                dto.setRequirements(job.getRequirements());
+                dto.setLocation(job.getLocation());
+                dto.setDatePosted(job.getDatePosted());
+                dto.setLogo(Base64.getEncoder().encodeToString(job.getCompany().getLogo()));
+                dto.setCompany(job.getCompany().getName());
+                return dto;
+            }).toList();
+
+
+            return new ResponseEntity<>(responseDTOs, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

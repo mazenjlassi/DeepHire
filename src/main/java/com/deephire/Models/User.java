@@ -43,6 +43,7 @@ public class User {
     @Column(columnDefinition = "LONGBLOB")
     private byte[] backGroundImage;
 
+    @Column(length = 1000)
     private String bio;
     private String location;
     private Boolean firstLogin;

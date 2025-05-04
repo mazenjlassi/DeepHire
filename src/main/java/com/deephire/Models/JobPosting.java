@@ -21,7 +21,9 @@ public class JobPosting {
     private Long id;
 
     private String title;
+    @Column(length = 1000)
     private String description;
+    @Column(length = 1000)
     private String requirements;
     private String location;
     private Date datePosted;

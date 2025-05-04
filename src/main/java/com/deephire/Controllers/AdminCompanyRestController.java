@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -208,4 +209,14 @@ public class AdminCompanyRestController {
             return new ResponseEntity<HttpStatus>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("/verify/{id}")
+    public ResponseEntity<?> verify(@PathVariable Long id) {
+        if (adminCompanyService.findById(id) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        adminCompanyService.verify(id);
+        return ResponseEntity.ok(new MessageResponse("Company verified successfully."));
+    }
+
 }

@@ -26,7 +26,7 @@ public class Company {
 
     private String location;
 
-
+    @Column(length = 1000)
     private String description;
 
 
