@@ -2,13 +2,13 @@ package com.deephire.Controllers;
 
 
 import com.deephire.Dto.KpiDto;
+import com.deephire.Dto.UserCompanyDto;
 import com.deephire.JWT.JwtUtils;
 import com.deephire.Models.AdminCompany;
 import com.deephire.Models.Company;
 import com.deephire.Models.RHCompany;
 import com.deephire.Models.User;
 import com.deephire.Repositories.*;
-import com.deephire.Service.AdminCompanyService;
 import com.deephire.Service.JobPostingService;
 import com.deephire.Service.RHCompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -164,6 +165,51 @@ public class AdminCompanyDashboardController {
             List<Integer> monthlyCounts = jobPostingService.getJobPostingsPerMonth(company);
 
             return ResponseEntity.ok(monthlyCounts);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping("/information-welcome-card")
+    public ResponseEntity<?> getInformationWelcomeCard(@RequestHeader("Authorization") String token) {
+        try {
+            if (token == null || !token.startsWith("Bearer ")) {
+                return new ResponseEntity<>("Token is missing or invalid", HttpStatus.BAD_REQUEST);
+            }
+
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Company company;
+            if (user instanceof AdminCompany adminCompany) {
+                company = companyRepository.getCompanyByAdmin(adminCompany);
+            } else if (user instanceof RHCompany rhCompany) {
+                company = rhCompany.getCompany();
+            } else {
+                return new ResponseEntity<>("User must be AdminCompany or RHCompany", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (company == null) {
+                return new ResponseEntity<>("Associated company not found", HttpStatus.NOT_FOUND);
+            }
+
+            UserCompanyDto userCompanyDto = new UserCompanyDto();
+            userCompanyDto.setCompanyName(company.getName());
+            userCompanyDto.setFirstName(user.getFirstName());
+            userCompanyDto.setLastName(user.getLastName());
+            userCompanyDto.setEmail(user.getEmail());
+            userCompanyDto.setLogo(Base64.getEncoder().encodeToString(company.getLogo()));
+            userCompanyDto.setLocation(company.getLocation());
+            userCompanyDto.setDescription(company.getDescription());
+            userCompanyDto.setIndustry(company.getIndustry());
+
+
+
+
+
+            return ResponseEntity.ok(userCompanyDto);
         } catch (Exception e) {
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
