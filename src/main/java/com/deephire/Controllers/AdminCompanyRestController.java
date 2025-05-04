@@ -98,6 +98,52 @@ public class AdminCompanyRestController {
         }
 
 
+
+    @PutMapping(value = "/update-profile-company", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateProfile(
+            @RequestHeader("Authorization") String token,
+            @RequestPart("profileData") String companyDataJson,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile logoCompany,
+            @RequestPart(value = "backGroundImage", required = false) MultipartFile backGroundImage) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            CompanyDto companyRequest = objectMapper.readValue(companyDataJson, CompanyDto.class);
+
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            AdminCompany user = adminCompanyService.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Create new company or use existing
+            Company company = user.getCompany();
+            company.setName(companyRequest.getName());
+            company.setIndustry(companyRequest.getIndustry());
+            company.setLocation(companyRequest.getLocation());
+            company.setDescription(companyRequest.getDescription());
+            if (logoCompany != null && !logoCompany.isEmpty()) {
+                company.setLogo(logoCompany.getBytes());
+            }
+            if (backGroundImage != null && !backGroundImage.isEmpty()) {
+                company.setBackgroundImage(backGroundImage.getBytes());
+            }
+
+            // Set the bi-directional relationship
+            company.setAdmin(user);     // Company → User
+            user.setCompany(company);   // User → Company
+            // Now save only the user
+            adminCompanyService.update(user);
+            // (company will be saved automatically if you have CascadeType.ALL)
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new MessageResponse("update profile completed successfully"));
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new MessageResponse("error  "));
+        }
+
+    }
     @PostMapping("/add")
     public ResponseEntity<AdminCompany> add(@RequestBody AdminCompany adminCompany) {
         try {
