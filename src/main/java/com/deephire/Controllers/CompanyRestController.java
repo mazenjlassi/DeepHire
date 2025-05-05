@@ -1,6 +1,7 @@
 package com.deephire.Controllers;
 
 
+import com.deephire.Repositories.CompanyRepository;
 import com.deephire.Service.CompanyService;
 import com.deephire.Models.Company;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ public class CompanyRestController {
 
     @Autowired
     private CompanyService companyService;
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @PostMapping("/add")
     public ResponseEntity<Company> add(@RequestBody Company company) {
@@ -78,4 +81,8 @@ public class CompanyRestController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
+
 }

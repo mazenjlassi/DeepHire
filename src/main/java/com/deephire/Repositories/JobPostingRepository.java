@@ -48,6 +48,18 @@ public interface JobPostingRepository extends JpaRepository<JobPosting, Long> {
     """, nativeQuery = true)
     List<Object[]> getMonthlyJobPostingsByCompanyNative(@Param("companyId") Long companyId);
 
-
+    @Query(value = """
+        SELECT m.month_num AS month, 
+               COALESCE(COUNT(j.id), 0) AS count
+        FROM (
+            SELECT 1 AS month_num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
+            SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
+            SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
+        ) AS m
+        LEFT JOIN job_posting j ON MONTH(j.date_posted) = m.month_num 
+        GROUP BY m.month_num
+        ORDER BY m.month_num
+    """, nativeQuery = true)
+    List<Object[]> getMonthlyJobPostings();
 
 }
