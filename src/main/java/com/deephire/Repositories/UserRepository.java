@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User,Long> {
     boolean existsByEmail(String email);
     long count();
 
+    Optional<User> findById(Long id);
+    List<User> findAll();
+
 //    @Query("SELECT new com.deephire.Dto.UserSearchDTO(u.username, u.firstName, u.lastName) " +
 //            "FROM User u WHERE CONCAT(u.firstName, ' ', u.lastName) LIKE CONCAT(:searchText, '%')")
 //    List<UserSearchDTO> searchUsersByFullNameStartsWith(@Param("searchText") String searchText);

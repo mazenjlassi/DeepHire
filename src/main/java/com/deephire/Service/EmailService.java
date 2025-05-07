@@ -92,6 +92,105 @@ public class EmailService {
         }
     }
 
+    public void sendCompanyStatusEmail(String email, String adminName, String companyName, boolean isApproved) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom("amirouni162@gmail.com");
+            helper.setTo(email);
+            helper.setSubject(isApproved
+                    ? "Congratulations! " + companyName + " Has Been Approved"
+                    : "Company Rejected !");
+
+            // HTML email template with status info
+            String htmlTemplate = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Company Status Update</title>
+            </head>
+            <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%%" style="max-width: 600px; background-color: #ffffff; margin: 20px auto; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: %s; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">%s</h1>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="color: #333333; font-size: 18px; margin-bottom: 10px;">Dear <strong>%s</strong>,</p>
+                            %s
+                            <div style="text-align: center; margin-top: 30px;">
+                                <a href="https://www.deephire.com/login" 
+                                   style="display: inline-block; padding: 12px 24px; background-color: %s; color: #ffffff; text-decoration: none; font-size: 16px; border-radius: 5px; font-weight: bold;">
+                                   %s
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                            <p style="color: #777777; font-size: 14px; margin: 0;">
+                                &copy; 2025 DeepHire. All rights reserved.
+                            </p>
+                            <p style="color: #777777; font-size: 14px; margin: 5px 0;">
+                                <a href="https://www.deephire.com/support" style="color: #007bff; text-decoration: none;">Contact Support</a> |
+                                <a href="https://www.deephire.com/privacy" style="color: #007bff; text-decoration: none;">Privacy Policy</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+        """;
+
+            String headerColor, title, messageContent, buttonColor, buttonText;
+
+            if (isApproved) {
+                headerColor = "#28a745"; // Green
+                title = "Company Approved!";
+                messageContent = """
+                <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                    We're pleased to inform you that your company <strong>%s</strong> has been approved on DeepHire!
+                </p>
+                <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                    You can now start using all the features available to your company account.
+                </p>
+                """.formatted(companyName);
+                buttonColor = "#28a745";
+                buttonText = "Access Your Account";
+            } else {
+                headerColor = "#dc3545"; // Red
+                title = "Company Registration Update";
+                messageContent = """
+                <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                    We regret to inform you that your company <strong>%s</strong> registration could not be approved at this time.
+                </p>
+                <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                    For more information about this decision or to appeal, please contact our support team.
+                </p>
+                """.formatted(companyName);
+                buttonColor = "#007bff";
+                buttonText = "Contact Support";
+            }
+
+            String htmlContent = String.format(htmlTemplate,
+                    headerColor, title, adminName, messageContent, buttonColor, buttonText);
+
+            helper.setText(htmlContent, true); // true = HTML
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log error
+            throw new RuntimeException("Failed to send company status email", e);
+        }
+    }
+
     public void sendEmail(String to, String subject, String content) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("amirouni162@gmail.com");

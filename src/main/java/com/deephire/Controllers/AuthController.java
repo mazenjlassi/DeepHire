@@ -161,6 +161,13 @@ AuthController {
             // Get the user entity
             User user = userRepository.findById(userDetails.getId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
+
+            if (user.isBanned()) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body("Your account is banned.");
+            }
+
             String jwt = jwtUtils.generateJwtToken(userDetails);
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)

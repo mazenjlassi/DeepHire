@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 public class JobCompanyDTO {
-
+    private  Long id;
     private String title;
     private String description;
     private String requirements;

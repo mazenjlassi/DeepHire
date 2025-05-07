@@ -1,5 +1,6 @@
 package com.deephire.Models;
 
+import com.deephire.Enums.CompanyStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -39,6 +40,10 @@ public class Company {
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] backgroundImage;
+
+
+    @Enumerated(EnumType.STRING)
+    private CompanyStatus status = CompanyStatus.PENDING;
 
 
 

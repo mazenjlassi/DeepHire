@@ -62,7 +62,7 @@ public class JobPostingRestController {
             if (jobPostings.isEmpty()) {
                 return new ResponseEntity<>(jobPostings, HttpStatus.NO_CONTENT);
             }
-            List<JobCompanyDTO> responseDTOs = jobPostings.stream().map(job -> {
+             List<JobCompanyDTO> responseDTOs = jobPostings.stream().map(job -> {
                 JobCompanyDTO dto = new JobCompanyDTO();
                 dto.setTitle(job.getTitle());
                 dto.setDescription(job.getDescription());
@@ -151,6 +151,7 @@ public class JobPostingRestController {
             JobPosting jobPosting = new JobPosting();
             jobPosting.setDatePosted(new Date());
             jobPosting.setCompany(company);
+
             jobPosting.setDescription(jobPostingRequestDTO.getDescription());
             jobPosting.setLocation(jobPostingRequestDTO.getLocation());
             jobPosting.setTitle(jobPostingRequestDTO.getTitle());
@@ -219,6 +220,7 @@ public class JobPostingRestController {
             List<JobPostingRequestDTO> responseDTOs = jobPostings.stream().map(job -> {
                 JobPostingRequestDTO dto = new JobPostingRequestDTO();
                 dto.setTitle(job.getTitle());
+                dto.setId(job.getId());
                 dto.setDescription(job.getDescription());
                 dto.setRequirements(job.getRequirements());
                 dto.setLocation(job.getLocation());
@@ -262,7 +264,15 @@ public class JobPostingRestController {
                     .orElseGet(() -> ResponseEntity.status(404).body(false));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(false);
+
+
+
+
+
         }
     }
+
+
+
 
 }

@@ -8,10 +8,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CompanyRepository extends JpaRepository<Company,Long> {
     Company getCompanyByAdmin(AdminCompany user);
+    Optional<Company> findCompanyByAdmin_Id(Long adminId);
 
     long count();
 

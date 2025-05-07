@@ -1,0 +1,16 @@
+package com.deephire.Dto;
+
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserAdminDto {
+    private Long id;
+    private String username;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private Boolean isBanned;
+}

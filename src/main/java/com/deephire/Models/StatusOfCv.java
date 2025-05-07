@@ -1,5 +1,6 @@
 package com.deephire.Models;
 
+import com.deephire.Enums.Status;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,8 @@ public class StatusOfCv {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private Status state=Status.PENDING;
 
     @ManyToOne
     @JsonBackReference("user-status")

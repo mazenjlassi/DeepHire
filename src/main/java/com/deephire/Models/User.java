@@ -83,4 +83,10 @@ public class User {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    private boolean isBanned = false;
+
+
+
+
 }
