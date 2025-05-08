@@ -6,10 +6,7 @@ import com.deephire.Dto.JobPostingRequestDTO;
 import com.deephire.Dto.JobPostingUpdateWrapperDTO;
 import com.deephire.JWT.JwtUtils;
 import com.deephire.Models.*;
-import com.deephire.Repositories.AdminCompanyRepository;
-import com.deephire.Repositories.CompanyRepository;
-import com.deephire.Repositories.JobPostingRepository;
-import com.deephire.Repositories.UserRepository;
+import com.deephire.Repositories.*;
 import com.deephire.Service.JobPostingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.batch.BatchProperties;
@@ -21,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/job-posting")
@@ -43,6 +41,8 @@ public class JobPostingRestController {
     private UserRepository userRepository;
     @Autowired
     private JobPostingRepository jobPostingRepository;
+    @Autowired
+    private StatusOfCvRepository statusOfCvRepository;
 
 
     @PostMapping("/add")
@@ -64,6 +64,7 @@ public class JobPostingRestController {
             }
              List<JobCompanyDTO> responseDTOs = jobPostings.stream().map(job -> {
                 JobCompanyDTO dto = new JobCompanyDTO();
+                dto.setId(job.getId());
                 dto.setTitle(job.getTitle());
                 dto.setDescription(job.getDescription());
                 dto.setRequirements(job.getRequirements());
@@ -228,6 +229,8 @@ public class JobPostingRestController {
                 return dto;
             }).toList();
 
+
+
             return ResponseEntity.ok(responseDTOs);
 
         } catch (Exception e) {
@@ -273,6 +276,54 @@ public class JobPostingRestController {
     }
 
 
+    @PostMapping("/applyToJob/{jobPostingID}")
+    public ResponseEntity<?> applyToJob(@PathVariable Long jobPostingID,
+                                           @RequestHeader("Authorization") String token) {
+        try {
+            if (token == null || !token.startsWith("Bearer ")) {
+                return new ResponseEntity<>("Token is missing or invalid", HttpStatus.BAD_REQUEST);
+            }
+
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
 
-}
+            Optional<JobPosting> jobPosting =jobPostingRepository.findById(jobPostingID);
+
+            boolean alreadyApplied = statusOfCvRepository.existsByUserAndJobPosting(user, jobPosting);
+            if (alreadyApplied) {
+                return ResponseEntity.status(409).body(false);
+            }
+
+            StatusOfCv status = new StatusOfCv();
+            status.setJobPosting(jobPosting.get());
+            status.setUser(user);
+            statusOfCvRepository.save(status);
+             return  ResponseEntity.ok(status);
+        } catch (Exception e) {
+
+            return ResponseEntity.status(500).body(false);
+        }
+    }
+
+    @GetMapping("/job-applied")
+    public ResponseEntity<?> jobApplied(@RequestHeader("Authorization") String token) {
+        try {
+            if (token == null || !token.startsWith("Bearer ")) {
+                return new ResponseEntity<>("Token is missing or invalid", HttpStatus.BAD_REQUEST);
+            }
+
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            return new ResponseEntity<>(statusOfCvRepository.findJobPostingsByUser(user), HttpStatus.OK);
+
+        }
+        catch (Exception e) {
+
+        return ResponseEntity.status(500).body(false);}
+    }
+
+        }
