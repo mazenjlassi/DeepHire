@@ -1,6 +1,9 @@
 package com.deephire.Controllers;
 
 
+import com.deephire.Dto.JobApplicationDTO;
+import com.deephire.Enums.Status;
+import com.deephire.Repositories.StatusOfCvRepository;
 import com.deephire.Service.StatusOfCvService;
 import com.deephire.Models.StatusOfCv;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ public class StatusOfCvRestController {
 
     @Autowired
     private StatusOfCvService statusOfCvService;
+    @Autowired
+    private StatusOfCvRepository statusOfCvRepository;
 
     @PostMapping("/add")
     public ResponseEntity<StatusOfCv> add(@RequestBody StatusOfCv statusOfCv) {
@@ -69,4 +74,54 @@ public class StatusOfCvRestController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("/approve")
+    public ResponseEntity<?> approve(@RequestBody JobApplicationDTO jobApplicationDTO) {
+        try {
+            // Fetch the StatusOfCv using userId and jobPostingId
+            StatusOfCv statusOfCv = statusOfCvRepository.findByUserIdAndJobPostingId(
+                    jobApplicationDTO.getUser().getId(),
+                    (long) jobApplicationDTO.getId()
+            ).orElse(null);
+
+            if (statusOfCv == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Application not found");
+            }
+
+            statusOfCv.setState(Status.APPROVED);
+            statusOfCvService.update(statusOfCv);
+
+            return ResponseEntity.status(HttpStatus.OK).body(true);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error while approving: " + e.getMessage());
+        }
+    }
+
+
+    @PutMapping("/reject")
+    public ResponseEntity<?> reject(@RequestBody JobApplicationDTO jobApplicationDTO) {
+        try {
+            // Fetch the StatusOfCv using userId and jobPostingId
+            StatusOfCv statusOfCv = statusOfCvRepository.findByUserIdAndJobPostingId(
+                    jobApplicationDTO.getUser().getId(),
+                    (long) jobApplicationDTO.getId()
+            ).orElse(null);
+
+            if (statusOfCv == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Application not found");
+            }
+
+            statusOfCv.setState(Status.REJECTED);
+            statusOfCvService.update(statusOfCv);
+
+            return ResponseEntity.status(HttpStatus.OK).body(true);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error while rejecting: " + e.getMessage());
+        }
+    }
+
 }

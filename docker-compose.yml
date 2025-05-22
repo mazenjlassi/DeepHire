@@ -31,6 +31,11 @@ services:
     environment:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: root
+      UPLOAD_LIMIT: 64M
+      PHP_UPLOAD_MAX_FILESIZE: 64M
+      PHP_POST_MAX_SIZE: 64M
+
+
     ports:
       - "8081:80"
     networks:

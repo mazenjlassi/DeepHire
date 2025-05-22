@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 
 @Data
 @NoArgsConstructor
@@ -27,4 +28,9 @@ public class StatusOfCv {
     @ManyToOne
     @JsonBackReference("jobposting-status")
     private JobPosting jobPosting;
+
+
+    public Status getStatus() {
+        return state;
+    }
 }

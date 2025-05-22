@@ -1,6 +1,7 @@
 package com.deephire.Controllers;
 
 
+import com.deephire.Dto.JobApplicationDTO;
 import com.deephire.Dto.JobCompanyDTO;
 import com.deephire.Dto.JobPostingRequestDTO;
 import com.deephire.Dto.JobPostingUpdateWrapperDTO;
@@ -326,4 +327,70 @@ public class JobPostingRestController {
         return ResponseEntity.status(500).body(false);}
     }
 
+
+
+
+    @GetMapping("/job-applications")
+    public ResponseEntity<?> getJobApplications(@RequestHeader("Authorization") String token) {
+        try {
+            if (token == null || !token.startsWith("Bearer ")) {
+                return new ResponseEntity<>("Token is missing or invalid", HttpStatus.BAD_REQUEST);
+            }
+
+            String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Company company;
+
+            if (user instanceof AdminCompany adminCompany) {
+                company = companyRepository.getCompanyByAdmin(adminCompany);
+            } else if (user instanceof RHCompany rhCompany) {
+                company = rhCompany.getCompany();
+            } else {
+                return new ResponseEntity<>("User must be AdminCompany or RHCompany", HttpStatus.UNAUTHORIZED);
+            }
+
+            if (company == null) {
+                return new ResponseEntity<>("Associated company not found", HttpStatus.NOT_FOUND);
+            }
+
+            List<JobPosting> jobPostings = jobPostingRepository.findJobPostingByCompany(company);
+
+            // 🟢 Get all applications (StatusOfCv) for those job postings
+            List<StatusOfCv> applications = statusOfCvRepository.findByJobPostingIn(jobPostings);
+
+            // 🟢 Map to DTO
+            List<JobApplicationDTO> dtos = applications.stream().map(application -> {
+                JobPosting job = application.getJobPosting();
+                User applicant = application.getUser(); // Important: the user who applied
+
+                JobApplicationDTO.UserDTO userDTO = new JobApplicationDTO.UserDTO(
+                        applicant.getId(), applicant.getUsername(), applicant.getEmail()
+                );
+
+                JobApplicationDTO.Status status = JobApplicationDTO.Status.PENDING;
+                if (application.getStatus() != null) {
+                    status = JobApplicationDTO.Status.valueOf(application.getStatus().name());
+                }
+
+                return new JobApplicationDTO(
+                        job.getId(),
+                        job.getTitle(),
+                        job.getCompany().getName(),
+                        job.getLocation(),
+                        job.getDatePosted(),
+                        status,
+                        userDTO
+                );
+            }).toList();
+
+            return ResponseEntity.ok(dtos);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Internal error: " + e.getMessage());
         }
+    }
+
+
+}

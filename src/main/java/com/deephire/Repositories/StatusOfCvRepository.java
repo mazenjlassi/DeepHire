@@ -37,4 +37,11 @@ public interface StatusOfCvRepository extends JpaRepository<StatusOfCv,Long> {
             "WHERE s.user = :user")
     List<JobPostingStatusDto> findJobPostingsByUser(User user);
 
+
+    List<StatusOfCv> findByJobPostingIn(List<JobPosting> jobPostings);
+
+    Optional<StatusOfCv> findByUserIdAndJobPostingId(Long userId, Long jobPostingId);
+
+
+
 }
